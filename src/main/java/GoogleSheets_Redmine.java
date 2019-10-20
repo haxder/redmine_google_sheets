@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GoogleSheets {
+public class GoogleSheets_Redmine {
     private static final String APPLICATION_NAME = "Google Sheets API";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
@@ -38,7 +38,7 @@ public class GoogleSheets {
 
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
-        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = GoogleSheets_Redmine.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
@@ -61,16 +61,16 @@ public class GoogleSheets {
                 .build();
     }
 
-    private static ValueRange getDataRange(String spreadsheetId, String range) throws IOException, GeneralSecurityException {
+    private static ValueRange getDataRange() throws IOException, GeneralSecurityException {
         Sheets service = createSheetsService();
         return service.spreadsheets().values()
-                .get(spreadsheetId, range)
+                .get(GoogleSheets_Redmine.spreadsheetId, GoogleSheets_Redmine.range)
                 .execute();
     }
 
     public static void main(String... args) throws IOException, GeneralSecurityException {
 
-        ValueRange response = getDataRange(spreadsheetId, range);
+        ValueRange response = getDataRange();
         List<List<Object>> values = response.getValues();
         if (values == null || values.isEmpty()) {
             System.out.println("No data found.");
@@ -78,7 +78,7 @@ public class GoogleSheets {
         } else {
             System.out.println("---------------------------Start---------------------------");
             int index = 1;
-            for (List row : values) {
+            for (List<Object> row : values) {
                 index++;
                 System.out.println(index);
                 if (row.size() == 0 || "".equals(row.get(0)) || "終了".equals(row.get(3))) {
@@ -95,7 +95,7 @@ public class GoogleSheets {
             System.out.println("---------------------------End---------------------------");
         }
 
-        batchUpdateValues(spreadsheetId, range, "USER_ENTERED", values);
+        batchUpdateValues("USER_ENTERED", values);
     }
 
     private static void updateRow(List<Object> row, Issue issue) {
@@ -112,23 +112,22 @@ public class GoogleSheets {
         row.set(4, issue.getAssigneeName());
     }
 
-    public static BatchUpdateValuesResponse batchUpdateValues(String spreadsheetId, String range,
-                                                              String valueInputOption,
-                                                              List<List<Object>> _values) throws GeneralSecurityException, IOException {
+    private static BatchUpdateValuesResponse batchUpdateValues(String valueInputOption,
+                                                               List<List<Object>> _values) throws GeneralSecurityException, IOException {
         Sheets service = createSheetsService();
-        List<List<Object>> values = new ArrayList<List<Object>>();
+        List<List<Object>> values;
 
         values = _values;
         List<ValueRange> data = new ArrayList<ValueRange>();
         data.add(new ValueRange()
-                .setRange(range)
+                .setRange(GoogleSheets_Redmine.range)
                 .setValues(values));
 
         BatchUpdateValuesRequest body = new BatchUpdateValuesRequest()
                 .setValueInputOption(valueInputOption)
                 .setData(data);
         BatchUpdateValuesResponse result =
-                service.spreadsheets().values().batchUpdate(spreadsheetId, body).execute();
+                service.spreadsheets().values().batchUpdate(GoogleSheets_Redmine.spreadsheetId, body).execute();
         System.out.printf("%d cells updated.", result.getTotalUpdatedCells());
         return result;
     }
