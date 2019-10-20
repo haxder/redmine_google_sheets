@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,12 +30,14 @@ public class GoogleSheets_Redmine {
     private static final String APPLICATION_NAME = "Google Sheets API";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
-    private static final  String spreadsheetId = "1fmtom4SeEz96Okd-6Nl65UV0KJZZoTDiWowvfcEpPrI";
+    private static final String spreadsheetId = "1fmtom4SeEz96Okd-6Nl65UV0KJZZoTDiWowvfcEpPrI";
     //private static final String spreadsheetId = "1PtqWCVqGnhobK_CE4EVoU9o_TheVzCe5vXOLUcOa51o";
     private static final String range = "Luvina-Task!B2:F";
 
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
+
+    private static List<Integer> google_sheet_ticket_ids = new ArrayList<Integer>();
 
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
@@ -87,6 +90,7 @@ public class GoogleSheets_Redmine {
                 // Print columns A and E, which correspond to indices 0 and 4.
                 Integer issueID = Integer.valueOf(row.get(0).toString());
                 Issue issue = Redmine.getIssue(issueID);
+                google_sheet_ticket_ids.add(issueID);
 
                 updateRow(row, issue);
                 System.out.printf("---Xử lý xong ID:%s-----\n", row.get(0));
@@ -99,7 +103,7 @@ public class GoogleSheets_Redmine {
     }
 
     private static void updateRow(List<Object> row, Issue issue) {
-        if(issue == null) {
+        if (issue == null) {
             return;
         }
         // 0 - ID Redmine
@@ -118,6 +122,10 @@ public class GoogleSheets_Redmine {
         List<List<Object>> values;
 
         values = _values;
+        List<List<Object>> ticketNew = getTicketNew();
+        if (ticketNew.size() > 0) {
+            values.addAll(ticketNew);
+        }
         List<ValueRange> data = new ArrayList<ValueRange>();
         data.add(new ValueRange()
                 .setRange(GoogleSheets_Redmine.range)
@@ -130,5 +138,22 @@ public class GoogleSheets_Redmine {
                 service.spreadsheets().values().batchUpdate(GoogleSheets_Redmine.spreadsheetId, body).execute();
         System.out.printf("%d cells updated.", result.getTotalUpdatedCells());
         return result;
+    }
+
+    private static List<List<Object>> getTicketNew() {
+        List<List<Object>> results = new ArrayList<List<Object>>();
+        List<Issue> issues = Redmine.getIssuesAssgineME();
+        if(issues == null) {
+            return results;
+        }
+        for (Issue is : issues) {
+            if (google_sheet_ticket_ids.contains(is.getId())) {
+                continue;
+            }
+            // ticket moi
+            List<Object> objects = Arrays.<Object>asList(is.getId(), new String(""), new String(is.getPriorityText()), new String(is.getStatusName()), new String(is.getAssigneeName()));
+            results.add(objects);
+        }
+        return results;
     }
 }

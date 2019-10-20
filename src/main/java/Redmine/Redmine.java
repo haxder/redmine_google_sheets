@@ -5,7 +5,6 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.internal.ResultsWrapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,24 +35,15 @@ public class Redmine {
         return issue;
     }
 
-    public static List<Issue> getIssues() {
+    public static List<Issue> getIssuesAssgineME() {
         createIssueManager();
         Map<String, String> param = new HashMap<String, String>();
         param.put("assigned_to_id", "59");
         try {
-            List<Issue> xxxx = issueManager.getIssues(param).getResults();
-            for (Issue is:xxxx) {
-                System.out.println(is.getId());
-            }
+            return issueManager.getIssues(param).getResults();
         } catch (RedmineException e) {
             e.printStackTrace();
         }
-
-
         return null;
-    }
-
-    public static void main(String[] args) {
-        getIssues();
     }
 }
