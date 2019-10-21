@@ -86,7 +86,7 @@ public class GoogleSheets_Redmine {
                 index++;
                 System.out.println(index);
 
-                if (row.size() == 0 || "".equals(row.get(0)) || "終了".equals(getDataIndexForRow(row, 3))) {
+                if (row.size() == 0 || "".equals(row.get(0)) || "終了".equals(getDataOfRow(row, 3))) {
                     continue;
                 }
                 // Print columns A and E, which correspond to indices 0 and 4.
@@ -117,21 +117,19 @@ public class GoogleSheets_Redmine {
         // 0 - ID Redmine
         // 1 - ID Lupack
         // 2 - Độ ưu tiên
-        //row.set(2, issue.getPriorityText());
         updateRow(row, 2, issue.getPriorityText());
-        // 3 - Ticket status
-        //row.set(3, issue.getStatusName());
-        updateRow(row, 3, issue.getStatusName());
-        // 4 - 担当者
-        //row.set(4, issue.getAssigneeName());
-        updateRow(row, 4, issue.getAssigneeName());
-        // 5 - 区分
-        //row.set(5, issue.getCustomFieldValuesById(148));
-        updateRow(row, 5, issue.getCustomFieldValuesById(148));
-        // 8 - Title
-        //row.set(8, issue.getSubject());
-        updateRow(row, 8, issue.getSubject());
 
+        // 3 - Ticket status
+        updateRow(row, 3, issue.getStatusName());
+
+        // 4 - 担当者
+        updateRow(row, 4, issue.getAssigneeName());
+
+        // 5 - 区分
+        updateRow(row, 5, issue.getCustomFieldValuesById(148));
+
+        // 8 - Title
+        updateRow(row, 8, issue.getSubject());
     }
 
     private static void updateRow(List<Object> row, int index, String value) {
@@ -146,7 +144,7 @@ public class GoogleSheets_Redmine {
         }
     }
 
-    private static Object getDataIndexForRow(List<Object> row, int index) {
+    private static Object getDataOfRow(List<Object> row, int index) {
         if (row.size() > index) {
             return row.get(index);
         }
