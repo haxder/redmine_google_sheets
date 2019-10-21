@@ -1,4 +1,5 @@
 import Redmine.Redmine;
+import Redmine.redmineapi.bean.Issue;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -14,7 +15,6 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.taskadapter.redmineapi.bean.Issue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,12 +32,13 @@ public class GoogleSheets_Redmine {
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final String spreadsheetId = "1fmtom4SeEz96Okd-6Nl65UV0KJZZoTDiWowvfcEpPrI";
     //private static final String spreadsheetId = "1PtqWCVqGnhobK_CE4EVoU9o_TheVzCe5vXOLUcOa51o";
-    private static final String range = "Luvina-Task!B2:F";
+    private static final String range = "Luvina-Task!B2:J";
 
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
-
+    private static final String IOS_URL= "https://www.ios-developer001.com/redmine/issues";
     private static List<Integer> google_sheet_ticket_ids = new ArrayList<Integer>();
+
 
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
@@ -92,7 +93,12 @@ public class GoogleSheets_Redmine {
                 Issue issue = Redmine.getIssue(issueID);
                 google_sheet_ticket_ids.add(issueID);
 
-                updateRow(row, issue);
+
+                try {
+                    updateRow(row, issue);
+                }catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
                 System.out.printf("---Xử lý xong ID:%s-----\n", row.get(0));
             }
 
@@ -114,6 +120,12 @@ public class GoogleSheets_Redmine {
         row.set(3, issue.getStatusName());
         // 4 - 担当者
         row.set(4, issue.getAssigneeName());
+        // 5 - 区分
+        row.set(5, issue.getCustomFieldValuesById(148));
+        // 8 - Title
+        if(!"".equals(issue.getSubject())) {
+            row.set(8, issue.getSubject());
+        }
     }
 
     private static BatchUpdateValuesResponse batchUpdateValues(String valueInputOption,
@@ -151,7 +163,8 @@ public class GoogleSheets_Redmine {
                 continue;
             }
             // ticket moi
-            List<Object> objects = Arrays.<Object>asList(is.getId(), new String(""), new String(is.getPriorityText()), new String(is.getStatusName()), new String(is.getAssigneeName()));
+            List<Object> objects = Arrays.<Object>asList(is.getId(), new String(""),is
+                    .getPriorityText(), is.getStatusName(), is.getAssigneeName());
             results.add(objects);
         }
         return results;
