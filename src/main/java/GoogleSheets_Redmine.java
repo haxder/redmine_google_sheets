@@ -36,7 +36,7 @@ public class GoogleSheets_Redmine {
 
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
-    private static final String IOS_URL= "https://www.ios-developer001.com/redmine/issues";
+    private static final String IOS_URL = "https://www.ios-developer001.com/redmine/issues";
     private static List<Integer> google_sheet_ticket_ids = new ArrayList<Integer>();
 
 
@@ -85,7 +85,8 @@ public class GoogleSheets_Redmine {
             for (List<Object> row : values) {
                 index++;
                 System.out.println(index);
-                if (row.size() == 0 || "".equals(row.get(0)) || "終了".equals(row.get(3))) {
+
+                if (row.size() == 0 || "".equals(row.get(0)) || "終了".equals(getDataIndexForRow(row, 3))) {
                     continue;
                 }
                 // Print columns A and E, which correspond to indices 0 and 4.
@@ -96,7 +97,7 @@ public class GoogleSheets_Redmine {
 
                 try {
                     updateRow(row, issue);
-                }catch (Exception e){
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
                 System.out.printf("---Xử lý xong ID:%s-----\n", row.get(0));
@@ -106,6 +107,7 @@ public class GoogleSheets_Redmine {
         }
 
         batchUpdateValues("USER_ENTERED", values);
+
     }
 
     private static void updateRow(List<Object> row, Issue issue) {
@@ -115,17 +117,40 @@ public class GoogleSheets_Redmine {
         // 0 - ID Redmine
         // 1 - ID Lupack
         // 2 - Độ ưu tiên
-        row.set(2, issue.getPriorityText());
+        //row.set(2, issue.getPriorityText());
+        updateRow(row, 2, issue.getPriorityText());
         // 3 - Ticket status
-        row.set(3, issue.getStatusName());
+        //row.set(3, issue.getStatusName());
+        updateRow(row, 3, issue.getStatusName());
         // 4 - 担当者
-        row.set(4, issue.getAssigneeName());
+        //row.set(4, issue.getAssigneeName());
+        updateRow(row, 4, issue.getAssigneeName());
         // 5 - 区分
-        row.set(5, issue.getCustomFieldValuesById(148));
+        //row.set(5, issue.getCustomFieldValuesById(148));
+        updateRow(row, 5, issue.getCustomFieldValuesById(148));
         // 8 - Title
-        if(!"".equals(issue.getSubject())) {
-            row.set(8, issue.getSubject());
+        //row.set(8, issue.getSubject());
+        updateRow(row, 8, issue.getSubject());
+
+    }
+
+    private static void updateRow(List<Object> row, int index, String value) {
+        int rowSize = row.size();
+        if (index < rowSize) {
+            row.set(index, value);
+        } else {
+            for (int i = rowSize; i <= index; i++) {
+                row.add("");
+            }
+            row.set(index, value);
         }
+    }
+
+    private static Object getDataIndexForRow(List<Object> row, int index) {
+        if (row.size() > index) {
+            return row.get(index);
+        }
+        return null;
     }
 
     private static BatchUpdateValuesResponse batchUpdateValues(String valueInputOption,
@@ -155,7 +180,7 @@ public class GoogleSheets_Redmine {
     private static List<List<Object>> getTicketNew() {
         List<List<Object>> results = new ArrayList<List<Object>>();
         List<Issue> issues = Redmine.getIssuesAssgineME();
-        if(issues == null) {
+        if (issues == null) {
             return results;
         }
         for (Issue is : issues) {
@@ -163,7 +188,7 @@ public class GoogleSheets_Redmine {
                 continue;
             }
             // ticket moi
-            List<Object> objects = Arrays.<Object>asList(is.getId(), new String(""),is
+            List<Object> objects = Arrays.<Object>asList(is.getId(), new String(""), is
                     .getPriorityText(), is.getStatusName(), is.getAssigneeName());
             results.add(objects);
         }
