@@ -32,7 +32,7 @@ public class GoogleSheets_Redmine {
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final String spreadsheetId = "1fmtom4SeEz96Okd-6Nl65UV0KJZZoTDiWowvfcEpPrI";
     //private static final String spreadsheetId = "1PtqWCVqGnhobK_CE4EVoU9o_TheVzCe5vXOLUcOa51o";
-    private static final String range = "Luvina-Task!B2:J";
+    private static final String range = "Luvina_Task!B2:J";
 
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
