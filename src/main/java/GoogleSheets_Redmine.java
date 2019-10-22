@@ -36,7 +36,6 @@ public class GoogleSheets_Redmine {
 
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
-    private static final String IOS_URL = "https://www.ios-developer001.com/redmine/issues";
     private static List<Integer> google_sheet_ticket_ids = new ArrayList<Integer>();
 
 
@@ -127,9 +126,10 @@ public class GoogleSheets_Redmine {
 
         // 5 - 区分
         updateRow(row, 5, issue.getCustomFieldValuesById(148));
-
-        // 8 - Title
-        updateRow(row, 8, issue.getSubject());
+        // 6 - Chức năng
+        updateRow(row, 6, issue.getCustomFieldValuesById(179));
+        // 7 - Title
+        updateRow(row, 7, issue.getSubject());
     }
 
     private static void updateRow(List<Object> row, int index, String value) {
