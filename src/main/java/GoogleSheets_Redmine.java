@@ -15,16 +15,15 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import common.DateUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.ZoneId;
+import java.util.*;
 
 public class GoogleSheets_Redmine {
     private static final String APPLICATION_NAME = "Google Sheets API";
@@ -130,10 +129,16 @@ public class GoogleSheets_Redmine {
         updateRow(row, 6, issue.getCustomFieldValuesById(179));
         // 7 - Title
         updateRow(row, 7, issue.getSubject());
+        // 8 - deadline
+        if (issue.getDueDate() != null) {
+            String dateStr = DateUtils.date2LocalDate(issue.getDueDate(), ZoneId.of("+9")).toString();
+            updateRow(row, 8, dateStr);
+        }
     }
 
     private static void updateRow(List<Object> row, int index, String value) {
         int rowSize = row.size();
+
         if (index < rowSize) {
             row.set(index, value);
         } else {

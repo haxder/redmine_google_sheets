@@ -2,10 +2,14 @@ package Redmine;
 
 import Redmine.redmineapi.*;
 import Redmine.redmineapi.bean.Issue;
+import common.DateUtils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 public class Redmine {
     private static String API_KEY = "d821ff33a0c1f69b9b901564948f71cefe276f6c";
@@ -53,15 +57,17 @@ public class Redmine {
         }
         return null;
     }
-
-/*    public static void main(String[] args) {
+/*
+    public static void main(String[] args) {
         List<Issue> issues = getIssuesAssgineME();
         Iterator itr = issues.iterator();
         while (itr.hasNext()){
             Issue temp = (Issue) itr.next();
-            if (temp.getDescription().contains("【ＱＡ内容】") || temp.getDescription().contains("【QA内容】")) {
-                System.out.println( temp.getId()+"-"+temp.getAssigneeName() + "-" +temp.getCustomFieldValuesById(148));
+            if(temp.getDueDate() != null) {
+                String dateStr = DateUtils.date2LocalDate(temp.getDueDate(), ZoneId.of("+9")).toString();
+                System.out.println(dateStr);
             }
+            System.out.println("end");
         }
     }*/
 }
