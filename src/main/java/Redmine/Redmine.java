@@ -2,14 +2,10 @@ package Redmine;
 
 import Redmine.redmineapi.*;
 import Redmine.redmineapi.bean.Issue;
-import common.DateUtils;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
 public class Redmine {
     private static String API_KEY = "d821ff33a0c1f69b9b901564948f71cefe276f6c";
