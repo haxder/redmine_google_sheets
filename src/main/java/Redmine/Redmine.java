@@ -3,10 +3,7 @@ package Redmine;
 import Redmine.redmineapi.*;
 import Redmine.redmineapi.bean.Issue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Redmine {
     private static String API_KEY = "d821ff33a0c1f69b9b901564948f71cefe276f6c";
@@ -38,8 +35,8 @@ public class Redmine {
         List<Issue> results = new ArrayList<>();
         Params params = new Params()
                 .add("assigned_to_id", "59")
-                .add("limit", "1000");
-
+                .add("limit", "1000")
+                .add("status_id","o");
         try {
             results = issueManager.getIssues(params).getResults();
             Iterator itr = results.iterator();
@@ -49,6 +46,7 @@ public class Redmine {
                     itr.remove();
                 }
             }
+            System.out.println("task:" + results.size());
             return results;
         } catch (RedmineException e) {
             e.printStackTrace();
