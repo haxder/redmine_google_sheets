@@ -4,13 +4,14 @@ import Redmine.redmineapi.*;
 import Redmine.redmineapi.bean.Issue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class Redmine {
     private static String API_KEY = "d821ff33a0c1f69b9b901564948f71cefe276f6c";
     private static String REDMINE_URL = "https://www.ios-developer001.com/redmine";
-
+    private static List<String> IGNORE_LIST= Arrays.asList("【ＱＡ内容】","【QA内容】");
     private static IssueManager issueManager = createIssueManager();
 
     private static IssueManager createIssueManager() {
@@ -43,8 +44,10 @@ public class Redmine {
             Iterator itr = results.iterator();
             while (itr.hasNext()){
                 Issue temp = (Issue) itr.next();
-                if (temp.getDescription().contains("【ＱＡ内容】") || temp.getDescription().contains("【QA内容】")) {
-                    itr.remove();
+                for (String ig: IGNORE_LIST) {
+                    if(temp.getDescription().contains(ig)){
+                        itr.remove();
+                    }
                 }
             }
             return  results;
